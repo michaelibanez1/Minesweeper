@@ -21,6 +21,8 @@ public class MyPanel extends JPanel {
 	public int noMine; //Variable used to trigger a tile if it is not a mine and no mines surround it. CRR
 	public Boolean[][] setMine = new Boolean[TOTAL_COLUMNS][TOTAL_ROWS]; //Array that contains variable for mines. CRR
 	public Boolean[][] flagged = new Boolean[TOTAL_COLUMNS][TOTAL_ROWS]; //Array to toggle a flag (if the player suspects that tile to be a mine). CRR
+	public Boolean[][] revealed = new Boolean[TOTAL_COLUMNS][TOTAL_ROWS];
+	public String[][] detect = new String[TOTAL_COLUMNS][TOTAL_ROWS];
 	public Color[][] colorArray = new Color[TOTAL_COLUMNS][TOTAL_ROWS];
 	public MyPanel() {   //This is the constructor... this code runs first to initialize
 		if (INNER_CELL_SIZE + (new Random()).nextInt(1) < 1) {	//Use of "random" to prevent unwanted Eclipse warning
@@ -55,6 +57,11 @@ public class MyPanel extends JPanel {
 				flagged[x][y] = false;
 			}
 		}
+		for (int x = 1; x < TOTAL_COLUMNS; x++) {   //Setting mines on the grid
+			for (int y = 1; y < TOTAL_ROWS; y++) {
+				revealed[x][y] = false;
+			}
+		}
 		//Sets the mines. CRR
 		while(mine > 0){
 			for (int x = 1; x < TOTAL_COLUMNS; x++) {   
@@ -78,7 +85,7 @@ public class MyPanel extends JPanel {
 		}
 		//Checks for mines to determine if it is surrounded or not. 
 		//Only covers anything not on the first row, first column, last row, and last column. CRR
-		for (int x = 2; x < TOTAL_COLUMNS - 1; x++) {   //The rest of the grid
+		/*for (int x = 2; x < TOTAL_COLUMNS - 1; x++) {   //The rest of the grid
 			for (int y = 2; y < TOTAL_ROWS - 1; y++) {
 					if(setMine[x-1][y-1] == false)
 						noMine++;
@@ -261,7 +268,7 @@ public class MyPanel extends JPanel {
 						noMine=0;
 				}					
 			}	
-		}
+		}*/
 		
 	}
 	public void paintComponent(Graphics g) {
