@@ -12,17 +12,20 @@ public class MyPanel extends JPanel {
 	private static final int INNER_CELL_SIZE = 29;
 	private static final int TOTAL_COLUMNS = 10;
 	private static final int TOTAL_ROWS = 11;   //Last row has only one cell
+	public int columns = TOTAL_COLUMNS;
+	public int rows = TOTAL_ROWS;
 	public int x = -1;
 	public int y = -1;
 	public int mouseDownGridX = 0;
 	public int mouseDownGridY = 0;
 	public int mine = 10; //Number of mines - 1. 
 	public int isMineOrNot; //RNG variable to determine if the tile will have a mine or not. CRR.
-	public int noMine; //Variable used to trigger a tile if it is not a mine and no mines surround it. CRR
+	public int isMine; //Variable used to trigger a tile if it is not a mine and no mines surround it. CRR
+	public int notMine = 0;
 	public Boolean[][] setMine = new Boolean[TOTAL_COLUMNS][TOTAL_ROWS]; //Array that contains variable for mines. CRR
 	public Boolean[][] flagged = new Boolean[TOTAL_COLUMNS][TOTAL_ROWS]; //Array to toggle a flag (if the player suspects that tile to be a mine). CRR
 	public Boolean[][] revealed = new Boolean[TOTAL_COLUMNS][TOTAL_ROWS];
-	public String[][] detect = new String[TOTAL_COLUMNS][TOTAL_ROWS];
+	public Integer[][] detect = new Integer[TOTAL_COLUMNS][TOTAL_ROWS];
 	public Color[][] colorArray = new Color[TOTAL_COLUMNS][TOTAL_ROWS];
 	public MyPanel() {   //This is the constructor... this code runs first to initialize
 		if (INNER_CELL_SIZE + (new Random()).nextInt(1) < 1) {	//Use of "random" to prevent unwanted Eclipse warning
@@ -40,28 +43,24 @@ public class MyPanel extends JPanel {
 		for (int y = 0; y < TOTAL_ROWS; y++) {   //Left column
 			colorArray[0][y] = Color.LIGHT_GRAY;
 		}
-		for (int x = 1; x < TOTAL_COLUMNS; x++) {   //The rest of the grid
+		
+		//Array that sets the grid and puts a Boolean Variable for mines, flags, 
+		//and determining if the tile is revealed or not on each tile. CRR
+		for (int x = 1; x < TOTAL_COLUMNS; x++) {   
 			for (int y = 1; y < TOTAL_ROWS; y++) {
 				colorArray[x][y] = Color.WHITE;
-			}
-		}
-		//Array that puts a Boolean Variable for mines on each tile. CRR
-		for (int x = 1; x < TOTAL_COLUMNS; x++) {   //Setting mines on the grid
-			for (int y = 1; y < TOTAL_ROWS; y++) {
 				setMine[x][y] = false;
-			}
-		}
-		//Array that puts Boolean Variable for flags on each tile. CRR
-		for (int x = 1; x < TOTAL_COLUMNS; x++) {   //Setting mines on the grid
-			for (int y = 1; y < TOTAL_ROWS; y++) {
 				flagged[x][y] = false;
-			}
-		}
-		for (int x = 1; x < TOTAL_COLUMNS; x++) {   //Setting mines on the grid
-			for (int y = 1; y < TOTAL_ROWS; y++) {
 				revealed[x][y] = false;
+				detect[x][y] = 0;
 			}
 		}
+		/* if(revealed[x][y] == true)
+		 * g.setColor(Color.BLACK)
+		 * g.setFont("Tahoma", Font.BOLD, 30)
+		 * g.drawString(Interger.toString([][], x, y))*/
+		
+		
 		//Sets the mines. CRR
 		while(mine > 0){
 			for (int x = 1; x < TOTAL_COLUMNS; x++) {   
@@ -74,8 +73,10 @@ public class MyPanel extends JPanel {
 							setMine[x][y] = true;
 							mine--;
 						}
-						else
+						else {
 							setMine[x][y] = false;
+							notMine++;
+						}
 					}
 					
 				}
@@ -85,84 +86,80 @@ public class MyPanel extends JPanel {
 		}
 		//Checks for mines to determine if it is surrounded or not. 
 		//Only covers anything not on the first row, first column, last row, and last column. CRR
-		/*for (int x = 2; x < TOTAL_COLUMNS - 1; x++) {   //The rest of the grid
+		for (int x = 2; x < TOTAL_COLUMNS - 1; x++) {   //The rest of the grid
 			for (int y = 2; y < TOTAL_ROWS - 1; y++) {
-					if(setMine[x-1][y-1] == false)
-						noMine++;
-					if(setMine[x-1][y] == false)
-						noMine++;
-					if(setMine[x-1][y+1] == false)
-						noMine++;
-					if(setMine[x][y-1] == false)
-						noMine++;
-					if(setMine[x][y] == false)
-						noMine++;
-					if(setMine[x][y+1] == false)
-						noMine++;
-					if(setMine[x+1][y-1] == false)
-						noMine++;
-					if(setMine[x+1][y] == false)
-						noMine++;
-					if(setMine[x+1][y+1] == false)
-						noMine++;
-					if(noMine==9){
-						colorArray[x][y] = Color.GRAY;
-						noMine=0;
-						}
-					else
-						noMine = 0;
+					if(setMine[x-1][y-1] == true)
+						isMine++;
+					if(setMine[x-1][y] == true)
+						isMine++;
+					if(setMine[x-1][y+1] == true)
+						isMine++;
+					if(setMine[x][y-1] == true)
+						isMine++;
+					if(setMine[x][y] == true)
+						isMine++;
+					if(setMine[x][y+1] == true)
+						isMine++;
+					if(setMine[x+1][y-1] == true)
+						isMine++;
+					if(setMine[x+1][y] == true)
+						isMine++;
+					if(setMine[x+1][y+1] == true)
+						isMine++;
+					if(isMine > 0){
+						detect[x][y] = isMine;
+						isMine=0;
+					}
 			}
 		}
 		//Checks the first row. CRR
 		for (int y = 1; y <=1; y++){
 			for (int x=1; x < TOTAL_COLUMNS; x++){
 				if(x == 1){
-					if(setMine[x][y] == false)
-						noMine++;
-					if(setMine[x][y+1] == false)
-						noMine++;
-					if(setMine[x+1][y] == false)
-						noMine++;
-					if(setMine[x+1][y+1] == false)
-						noMine++;
-					if (noMine == 4){
-						colorArray[x][y] = Color.GRAY;
-						noMine = 0;
+					if(setMine[x][y] == true)
+						isMine++;
+					if(setMine[x][y+1] == true)
+						isMine++;
+					if(setMine[x+1][y] == true)
+						isMine++;
+					if(setMine[x+1][y+1] == true)
+						isMine++;
+					if (isMine > 0){
+						detect[x][y] = isMine;
+						isMine = 0;
 					}
 				}
 				else if (x == TOTAL_COLUMNS - 1){
-					if(setMine[x][y] == false)
-						noMine++;
-					if(setMine[x-1][y] == false)
-						noMine++;
-					if(setMine[x-1][y+1] == false)
-						noMine++;
-					if(setMine[x][y+1] == false)
-						noMine++;
-					if (noMine == 4){
-						colorArray[x][y] = Color.GRAY;
-						noMine = 0;
+					if(setMine[x][y] == true)
+						isMine++;
+					if(setMine[x-1][y] == true)
+						isMine++;
+					if(setMine[x-1][y+1] == true)
+						isMine++;
+					if(setMine[x][y+1] == true)
+						isMine++;
+					if (isMine > 0){
+						detect[x][y] = isMine;
+						isMine = 0;
 					}
 				}
 				else {
-					if(setMine[x-1][y] == false)
-						noMine++;
-					if(setMine[x-1][y+1] == false)
-						noMine++;
-					if(setMine[x][y] == false)
-						noMine++;
-					if(setMine[x][y+1] == false)
-						noMine++;
-					if(setMine[x+1][y] == false)
-						noMine++;
-					if(setMine[x+1][y+1] == false)
-						noMine++;
-					if(noMine==6){
-						colorArray[x][y] = Color.GRAY;
-						noMine=0;
+					if(setMine[x-1][y] == true)
+						isMine++;
+					if(setMine[x-1][y+1] == true)
+						isMine++;
+					if(setMine[x][y] == true)
+						isMine++;
+					if(setMine[x][y+1] == true)
+						isMine++;
+					if(setMine[x+1][y] == true)
+						isMine++;
+					if(setMine[x+1][y+1] == true)
+						isMine++;
+					if(isMine > 0){
+						detect[x][y] = isMine;
+						isMine=0;
 						}
-					else
-						noMine = 0;
 				}
 			}
 		}
@@ -170,24 +167,22 @@ public class MyPanel extends JPanel {
 		for (int x = 1; x <=1; x++){
 			for (int y=2; y < TOTAL_ROWS-1; y++){
 				if (y < TOTAL_ROWS-1){
-					if(setMine[x][y-1] == false)
-						noMine++;
-					if(setMine[x][y] == false)
-						noMine++;
-					if(setMine[x][y+1] == false)
-						noMine++;
-					if(setMine[x+1][y-1] == false)
-						noMine++;
-					if(setMine[x+1][y] == false)
-						noMine++;
-					if(setMine[x+1][y+1] == false)
-						noMine++;
-					if(noMine==6){
-						colorArray[x][y] = Color.GRAY;
-						noMine=0;
+					if(setMine[x][y-1] == true)
+						isMine++;
+					if(setMine[x][y] == true)
+						isMine++;
+					if(setMine[x][y+1] == true)
+						isMine++;
+					if(setMine[x+1][y-1] == true)
+						isMine++;
+					if(setMine[x+1][y] == true)
+						isMine++;
+					if(setMine[x+1][y+1] == true)
+						isMine++;
+					if(isMine > 0){
+						detect[x][y] = isMine;
+						isMine=0;
 					}
-					else
-						noMine=0;
 				}					
 			}	
 		}
@@ -195,52 +190,50 @@ public class MyPanel extends JPanel {
 		for (int y = 9; y <=9; y++){
 			for (int x=1; x < TOTAL_COLUMNS; x++){
 				if(x == 1){
-					if(setMine[x][y] == false)
-						noMine++;
-					if(setMine[x][y-1] == false)
-						noMine++;
-					if(setMine[x+1][y] == false)
-						noMine++;
-					if(setMine[x+1][y-1] == false)
-						noMine++;
-					if (noMine == 4){
-						colorArray[x][y] = Color.GRAY;
-						noMine = 0;
+					if(setMine[x][y] == true)
+						isMine++;
+					if(setMine[x][y-1] == true)
+						isMine++;
+					if(setMine[x+1][y] == true)
+						isMine++;
+					if(setMine[x+1][y-1] == true)
+						isMine++;
+					if (isMine > 0){
+						detect[x][y] = isMine;
+						isMine = 0;
 					}
 				}
 				else if (x == TOTAL_COLUMNS - 1){
-					if(setMine[x][y] == false)
-						noMine++;
-					if(setMine[x-1][y] == false)
-						noMine++;
-					if(setMine[x-1][y-1] == false)
-						noMine++;
-					if(setMine[x][y-1] == false)
-						noMine++;
-					if (noMine == 4){
-						colorArray[x][y] = Color.GRAY;
-						noMine = 0;
+					if(setMine[x][y] == true)
+						isMine++;
+					if(setMine[x-1][y] == true)
+						isMine++;
+					if(setMine[x-1][y-1] == true)
+						isMine++;
+					if(setMine[x][y-1] == true)
+						isMine++;
+					if (isMine > 0){
+						detect[x][y] = isMine;
+						isMine = 0;
 					}
 				}
 				else {
-					if(setMine[x-1][y] == false)
-						noMine++;
-					if(setMine[x-1][y-1] == false)
-						noMine++;
-					if(setMine[x][y] == false)
-						noMine++;
-					if(setMine[x][y-1] == false)
-						noMine++;
-					if(setMine[x+1][y] == false)
-						noMine++;
-					if(setMine[x+1][y-1] == false)
-						noMine++;
-					if(noMine==6){
-						colorArray[x][y] = Color.GRAY;
-						noMine=0;
+					if(setMine[x-1][y] == true)
+						isMine++;
+					if(setMine[x-1][y-1] == true)
+						isMine++;
+					if(setMine[x][y] == true)
+						isMine++;
+					if(setMine[x][y-1] == true)
+						isMine++;
+					if(setMine[x+1][y] == true)
+						isMine++;
+					if(setMine[x+1][y-1] == true)
+						isMine++;
+					if(isMine > 0){
+						detect[x][y] = isMine;
+						isMine = 0;
 						}
-					else
-						noMine = 0;
 				}
 			}
 		}
@@ -248,32 +241,30 @@ public class MyPanel extends JPanel {
 		for (int x = 9; x <=9; x++){
 			for (int y=2; y < TOTAL_ROWS-1; y++){
 				if (y < TOTAL_ROWS-1){
-					if(setMine[x][y-1] == false)
-						noMine++;
-					if(setMine[x][y] == false)
-						noMine++;
-					if(setMine[x][y+1] == false)
-						noMine++;
-					if(setMine[x-1][y-1] == false)
-						noMine++;
-					if(setMine[x-1][y] == false)
-						noMine++;
-					if(setMine[x-1][y+1] == false)
-						noMine++;
-					if(noMine==6){
-						colorArray[x][y] = Color.GRAY;
-						noMine=0;
+					if(setMine[x][y-1] == true)
+						isMine++;
+					if(setMine[x][y] == true)
+						isMine++;
+					if(setMine[x][y+1] == true)
+						isMine++;
+					if(setMine[x-1][y-1] == true)
+						isMine++;
+					if(setMine[x-1][y] == true)
+						isMine++;
+					if(setMine[x-1][y+1] == true)
+						isMine++;
+					if(isMine > 0){
+						detect[x][y] = isMine;
+						isMine=0;
 					}
-					else
-						noMine=0;
 				}					
 			}	
-		}*/
+		}
 		
 	}
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-
+		
 		//Compute interior coordinates
 		Insets myInsets = getInsets();
 		int x1 = myInsets.left;
@@ -310,6 +301,7 @@ public class MyPanel extends JPanel {
 				}
 			}
 		}
+		
 	}
 	public int getGridX(int x, int y) {
 		Insets myInsets = getInsets();
@@ -361,5 +353,7 @@ public class MyPanel extends JPanel {
 		}
 		return y;
 	}
+	
+	
 	
 }

@@ -82,6 +82,7 @@ public class MyMouseAdapter extends MouseAdapter {
 			myPanel.y = y;
 			int gridX = myPanel.getGridX(x, y);
 			int gridY = myPanel.getGridY(x, y);
+			int noMine = 0;
 			if ((myPanel.mouseDownGridX == -1) || (myPanel.mouseDownGridY == -1)) {
 				//Had pressed outside
 				//Do nothing
@@ -96,102 +97,41 @@ public class MyMouseAdapter extends MouseAdapter {
 					} else {
 						//Released the mouse button on the same cell where it was pressed
 						if ((gridX == 0) || (gridY == 0)) {
-							
 							//when pressing the gray buttons on top
 							
 						} else {
 							//On the grid other than on the left column and on the top row:
-							//Method checks if the button pressed is a mine or not. 
+							//Method checks if the button pressed is a mine or not. CRR
+							
 							if  (myPanel.flagged[myPanel.mouseDownGridX][myPanel.mouseDownGridY] == false){
 								if (myPanel.setMine[myPanel.mouseDownGridX][myPanel.mouseDownGridY] == true){	
-									for (int i=1; i < 10;i++)
-										for (int j=1; j < 10;j++){
+									for (int i=1; i < myPanel.columns ;i++)
+										for (int j=1; j < myPanel.rows;j++){
 											myPanel.revealed[i][j] = true;
 											if (myPanel.setMine[i][j] == true){
 												myPanel.colorArray[i][j] = Color.BLACK;
 												myPanel.repaint();
+												
 											}
-										//Insert method to check this surrounding tile for mines and show 
-										//the amount this tile surrounds here. Delete this comment once you're done.
 										}
+									System.out.println("You lose....");
 									}
 								else{
-								}
-									int isMine = 0;
-									boolean danger = false;
+									
+									noMine++;
 									myPanel.revealed[myPanel.mouseDownGridX][myPanel.mouseDownGridY] = true;
 									myPanel.colorArray[myPanel.mouseDownGridX][myPanel.mouseDownGridY] = Color.GRAY;
-									if (myPanel.mouseDownGridX == 1 && myPanel.mouseDownGridY == 1){
-											if(myPanel.setMine[x][y] == true){
-												isMine++;
-												danger = true;
+									System.out.println(myPanel.detect[myPanel.mouseDownGridX][myPanel.mouseDownGridY].toString() + "("
+									 +  myPanel.mouseDownGridX + "," + myPanel.mouseDownGridY + ")");
+									for (int i=1; i < myPanel.columns ;i++)
+										for (int j=1; j < myPanel.rows;j++){
+											if(noMine == myPanel.notMine){
+												System.out.println("You have won the game!");
 											}
-											if(myPanel.setMine[x][y+1] == true){
-												isMine++;
-												danger = true;
-											}
-											if(myPanel.setMine[x+1][y] == true){
-												isMine++;
-												danger = true;
-											}
-											if(myPanel.setMine[x+1][y+1] == true){
-												isMine++;
-												danger = true;
-											}
-											if (isMine > 0){
-												
-												myPanel.colorArray[x][y] = Color.GRAY;
-												isMine = 0;
-											}
-									}
-									else if ((x >= 2 && x <=9) || (y >= 2 && y <= 9)){
-												if(myPanel.setMine[x-1][y-1] == false){
-													isMine++;
-													danger = true;
-												}
-												if(myPanel.setMine[x][y-1] == false){
-													isMine++;
-													danger = true;
-												}
-												if(myPanel.setMine[x+1][y-1] == false){
-													isMine++;
-													danger = true;
-												}
-												if(myPanel.setMine[x-1][y] == false){
-													isMine++;
-													danger = true;
-												}
-												if(myPanel.setMine[x+1][y] == false){
-													isMine++;
-													danger = true;
-												}
-												if(myPanel.setMine[x-1][y+1] == false){
-													isMine++;
-													danger = true;
-												}
-												if(myPanel.setMine[x][y+1] == false){
-													isMine++;
-													danger = true;
-												}
-												if(myPanel.setMine[x+1][y+1] == false){
-													isMine++;
-													danger = true;
-												}
-												if(isMine > 0){
-													//myPanel.detect[x][y] = ;
-													myPanel.colorArray[x][y] = Color.GRAY;
-													isMine=0;
-													}
-												else{
-													myPanel.colorArray[x][y] = Color.GRAY;
-													isMine = 0;
-												}
-										
-									
+										}
 								}
 							}
-						}
-						
+						}	
 					}
 				}
 			}
@@ -258,4 +198,3 @@ public class MyMouseAdapter extends MouseAdapter {
 			//Do nothing
 	}
 }
-
